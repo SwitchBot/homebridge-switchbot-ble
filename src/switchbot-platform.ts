@@ -58,6 +58,7 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
    */
   accessories(callback: (foundAccessories: AccessoryPlugin[]) => void): void {
     let deviceList = [];
+    if (this.config.devices) {
     for (var device of this.config.devices) {
       // this.log.info(device.type);
       // this.log.info(device.name);
@@ -84,6 +85,7 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
           break;
       }
     }
+  }
     this.log("Device amount:", deviceList.length.toString());
     callback(deviceList);
   }
