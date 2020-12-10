@@ -2,6 +2,7 @@ import { AccessoryPlugin, API, HAP, Logging, PlatformConfig, StaticPlatformPlugi
 import { Bot } from "./bot-accessory";
 import { Curtain } from "./curtain-accessory";
 import { Meter } from "./meter-accessory";
+import { Humidifier } from "./humidifier-accessory";
 import { off } from "process";
 
 const PLATFORM_NAME = "SwitchBotPlatform";
@@ -68,6 +69,9 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
       switch (device.type) {
         case 'bot':
           deviceList.push(new Bot(hap, this.log, device.name, device.bleMac.toLowerCase(), scanDuration));
+          break;
+        case 'humidifier':
+          deviceList.push(new Humidifier(hap, this.log, device.name, device.bleMac.toLowerCase(), scanDuration));
           break;
         case 'curtain':
           const reverseDir: boolean = device.reverseDir || false;

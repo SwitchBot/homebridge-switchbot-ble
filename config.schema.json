@@ -1,0 +1,77 @@
+{
+  "pluginAlias": "SwitchBotPlatform",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "SwitchBotPlatform"
+      },
+      "devices": {
+        "type": "array",
+        "title": "Devices",
+        "required": true,
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Type",
+              "required": true,
+              "default": "form",
+              "oneOf": [
+                {
+                  "title": "Bot",
+                  "enum": ["bot"]
+                },
+                {
+                  "title": "Humidifier",
+                  "enum": ["humidifier"]
+                },
+                {
+                  "title": "Meter",
+                  "enum": ["meter"]
+                },
+                {
+                  "title": "Curtain",
+                  "enum": ["curtain"]
+                }
+              ]
+            },
+            "name": {
+              "type": "string",
+              "required": true,
+              "title": "Name"
+            },
+            "bleMac": {
+              "type": "string",
+              "required": true,
+              "title": "Mac Address - Bluetooth",
+              "placeholder": "d4:cc:43:97:ae:2c"
+            },
+            "scanDuration": {
+              "type": "integer",
+              "title": "Scan Duration"
+            },
+            "scanInterval": {
+              "type": "integer",
+              "title": "Scan Interval"
+            },
+            "reverseDir": {
+              "type": "boolean",
+              "title": "Reverse Dir"
+            },
+            "moveTime": {
+              "type": "integer",
+              "title": "Scan Duration"
+            }
+          }
+        }
+      }
+    }
+  }
+}
