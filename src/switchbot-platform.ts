@@ -89,6 +89,8 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
           break;
       }
     }
+  } else {
+    this.log.error('No Device Set In Config')
   }
     this.log("Device amount:", deviceList.length.toString());
     callback(deviceList);
