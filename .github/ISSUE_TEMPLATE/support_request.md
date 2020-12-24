@@ -1,4 +1,4 @@
-+---
+---
 name: Support Request
 about: Need help?
 title: ''
