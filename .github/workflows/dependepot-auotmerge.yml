@@ -10,7 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: marcoroth/dependabot-bump-together-action@master
+        with:
+          packages: dependency_1, dependency_2
+          token: ${{secrets.github_token}}
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
           target: minor
-          github-token: ${{ secrets.UPDATES_TOKEN }}
+          github-token: ${{secrets.github_token}}
