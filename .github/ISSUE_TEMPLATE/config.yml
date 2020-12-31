@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: SwitchBot (Official website)
+     url: https://www.switch-bot.com/
+  - name: Facebook @SwitchBotRobot
+     url: https://www.facebook.com/SwitchBotRobot/
+  - name: Twitter @SwitchBot
+     url: https://twitter.com/switchbot
   - name: Homebridge Discord Channel for SwitchBot
     url: https://discord.gg/5wYTbwP4ha
     about: Please ask and answer questions here.
-  - name: Homebridge Switchbot BLE - Pull Requests
-    url: https://github.com/OpenWonderLabs/homebridge-switchbot-ble/pulls
-    about: Please report security vulnerabilities here.
