@@ -1,6 +1,6 @@
 {
   "name": "@switchbot/homebridge-switchbot-ble",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "Homebridge integration for SwitchBot BLE series products",
   "author": "SwitchBot <support@wondertechlabs.com> (https://github.com/SwitchBot)",
   "license": "ISC",
