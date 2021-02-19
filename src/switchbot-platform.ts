@@ -2,13 +2,7 @@
 /* eslint-disable no-var */
 /* eslint-disable no-case-declarations */
 /* eslint-disable prefer-const */
-import { AccessoryPlugin, 
-  API, 
-  HAP, 
-  Logging, 
-  PlatformConfig, 
-  StaticPlatformPlugin, 
-} from "homebridge";
+import { AccessoryPlugin, API, HAP, Logging, PlatformConfig, StaticPlatformPlugin } from "homebridge";
 import { Bot } from "./bot-accessory";
 import { Curtain } from "./curtain-accessory";
 import { Meter } from "./meter-accessory";
@@ -47,7 +41,6 @@ export = (api: API) => {
 };
 
 class SwitchBotPlatform implements StaticPlatformPlugin {
-
   private readonly log: Logging;
   private readonly config: PlatformConfig;
 
@@ -76,15 +69,15 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
         // this.log.info(device.scanDuration, typeof device.scanDuration);
         let scanDuration: number = device.scanDuration || 1000;
         switch (device.type) {
-          case 'bot':
+          case "bot":
             deviceList.push(new Bot(hap, this.log, device.name, device.bleMac.toLowerCase(), scanDuration));
             break;
-          case 'curtain':
+          case "curtain":
             const reverseDir: boolean = device.reverseDir || false;
             const moveTime: number = device.moveTime || 2000;
             deviceList.push(new Curtain(hap, this.log, device.name, device.bleMac.toLowerCase(), scanDuration, reverseDir, moveTime));
             break;
-          case 'meter':
+          case "meter":
             let scanInterval: number = device.scanInterval || 60000;
             if (scanInterval < scanDuration) {
               scanInterval = scanDuration + 1000;
@@ -96,7 +89,7 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
         }
       }
     } else {
-      this.log.error('No Device Set In Config');
+      this.log.error("No Device Set In Config");
     }
     this.log("Device amount:", deviceList.length.toString());
     callback(deviceList);

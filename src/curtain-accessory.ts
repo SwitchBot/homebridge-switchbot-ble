@@ -15,7 +15,6 @@ import {
 import { rejects } from "assert";
 
 export class Curtain implements AccessoryPlugin {
-
   private readonly log: Logging;
   private readonly bleMac: string;
   private readonly scanDuration: number;
@@ -44,13 +43,15 @@ export class Curtain implements AccessoryPlugin {
     this.positionState = hap.Characteristic.PositionState.STOPPED;
 
     this.curtainService = new hap.Service.WindowCovering(name);
-    this.curtainService.getCharacteristic(hap.Characteristic.CurrentPosition)
+    this.curtainService
+      .getCharacteristic(hap.Characteristic.CurrentPosition)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         log.info("Current position of Curtain was returned: " + this.currentPosition + "%");
         callback(undefined, this.currentPosition);
       });
 
-    this.curtainService.getCharacteristic(hap.Characteristic.TargetPosition)
+    this.curtainService
+      .getCharacteristic(hap.Characteristic.TargetPosition)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         log.info("Target position of Curtain was returned: " + this.targetPosition + "%");
         callback(undefined, this.targetPosition);
@@ -61,11 +62,9 @@ export class Curtain implements AccessoryPlugin {
         clearTimeout(this.moveTimer);
         if (this.targetPosition > this.currentPosition) {
           this.positionState = hap.Characteristic.PositionState.INCREASING;
-        }
-        else if (this.targetPosition < this.currentPosition) {
+        } else if (this.targetPosition < this.currentPosition) {
           this.positionState = hap.Characteristic.PositionState.DECREASING;
-        }
-        else {
+        } else {
           this.positionState = hap.Characteristic.PositionState.STOPPED;
         }
 
@@ -74,78 +73,80 @@ export class Curtain implements AccessoryPlugin {
           this.curtainService?.getCharacteristic(hap.Characteristic.CurrentPosition).updateValue(this.currentPosition);
           this.curtainService?.getCharacteristic(hap.Characteristic.PositionState).updateValue(this.positionState);
           callback();
-        }
-        else {
-          const SwitchBot = require('node-switchbot');
+        } else {
+          const SwitchBot = require("node-switchbot");
           const switchbot = new SwitchBot();
-          switchbot.discover({ duration: this.scanDuration, model: 'c', quick: false }).then((device_list: any) => {
-            log.info('Scan done.');
-            let targetDevice: any = null;
-            for (let device of device_list) {
-              log.info(device.modelName, device.address);
-              if (device.address == this.bleMac) {
-                targetDevice = device;
-                break;
+          switchbot
+            .discover({ duration: this.scanDuration, model: "c", quick: false })
+            .then((device_list: any) => {
+              log.info("Scan done.");
+              let targetDevice: any = null;
+              for (let device of device_list) {
+                log.info(device.modelName, device.address);
+                if (device.address == this.bleMac) {
+                  targetDevice = device;
+                  break;
+                }
               }
-            }
-            if (!targetDevice) {
-              log.info(name + ' (' + bleMac + ') was not found.');
-              return new Promise((resolve, reject) => {
-                reject(new Error('No target device was found.'));
-              });
-            }
-            else {
-              log.info(targetDevice.modelName + ' (' + targetDevice.address + ') was found.');
-              // Set event handers
-              targetDevice.onconnect = () => {
-                // log.info('Connected.');
-              };
-              targetDevice.ondisconnect = () => {
-                // log.info('Disconnected.');
-              };
-              log.info('Curtain is moving...');
-              /**opend - 0% in HomeKit, 100% in Curtain device.
-               * closed - 100% in HomeKit, 0% in Curtain device.
-               * To keep the status synchronized, convert the percentage of homekit to the percentage of Curtain.
-               */
-              let covertToDevicePosition = 0;
-              if (!reverseDir) {
-                covertToDevicePosition = 100 - this.targetPosition;
+              if (!targetDevice) {
+                log.info(name + " (" + bleMac + ") was not found.");
+                return new Promise((resolve, reject) => {
+                  reject(new Error("No target device was found."));
+                });
+              } else {
+                log.info(targetDevice.modelName + " (" + targetDevice.address + ") was found.");
+                // Set event handers
+                targetDevice.onconnect = () => {
+                  // log.info('Connected.');
+                };
+                targetDevice.ondisconnect = () => {
+                  // log.info('Disconnected.');
+                };
+                log.info("Curtain is moving...");
+                /**opend - 0% in HomeKit, 100% in Curtain device.
+                 * closed - 100% in HomeKit, 0% in Curtain device.
+                 * To keep the status synchronized, convert the percentage of homekit to the percentage of Curtain.
+                 */
+                let covertToDevicePosition = 0;
+                if (!reverseDir) {
+                  covertToDevicePosition = 100 - this.targetPosition;
+                } else {
+                  log.info('Reverse the "opened" and "closed" directions!');
+                  covertToDevicePosition = this.targetPosition;
+                }
+                return targetDevice.runToPos(covertToDevicePosition);
               }
-              else {
-                log.info('Reverse the "opened" and "closed" directions!');
-                covertToDevicePosition = this.targetPosition;
-              }
-              return targetDevice.runToPos(covertToDevicePosition);
-            }
-          }).then(() => {
-            log.info('Done.');
-            log.info("Target position of Curtain has been set to: " + this.targetPosition + "%");
-            this.moveTimer = setTimeout(() => {
-              // log.info("setTimeout", this.positionState.toString(), this.currentPosition.toString(), this.targetPosition.toString());
-              this.currentPosition = this.targetPosition;
-              this.positionState = hap.Characteristic.PositionState.STOPPED;
-              // this.curtainService?.getCharacteristic(hap.Characteristic.TargetPosition).updateValue(this.targetPosition);
-              this.curtainService?.getCharacteristic(hap.Characteristic.CurrentPosition).updateValue(this.currentPosition);
-              this.curtainService?.getCharacteristic(hap.Characteristic.PositionState).updateValue(this.positionState);
-            }, this.moveTime);
-            callback();
-          }).catch((error: any) => {
-            log.error(error);
-            this.moveTimer = setTimeout(() => {
-              this.targetPosition = this.currentPosition;
-              this.positionState = hap.Characteristic.PositionState.STOPPED;
-              this.curtainService?.getCharacteristic(hap.Characteristic.TargetPosition).updateValue(this.targetPosition);
-              // this.curtainService?.getCharacteristic(hap.Characteristic.CurrentPosition).updateValue(this.currentPosition);
-              this.curtainService?.getCharacteristic(hap.Characteristic.PositionState).updateValue(this.positionState);
-            }, 1000);
-            log.info("Target position of Curtain failed to be set to: " + this.targetPosition + "%");
-            callback();
-          });
+            })
+            .then(() => {
+              log.info("Done.");
+              log.info("Target position of Curtain has been set to: " + this.targetPosition + "%");
+              this.moveTimer = setTimeout(() => {
+                // log.info("setTimeout", this.positionState.toString(), this.currentPosition.toString(), this.targetPosition.toString());
+                this.currentPosition = this.targetPosition;
+                this.positionState = hap.Characteristic.PositionState.STOPPED;
+                // this.curtainService?.getCharacteristic(hap.Characteristic.TargetPosition).updateValue(this.targetPosition);
+                this.curtainService?.getCharacteristic(hap.Characteristic.CurrentPosition).updateValue(this.currentPosition);
+                this.curtainService?.getCharacteristic(hap.Characteristic.PositionState).updateValue(this.positionState);
+              }, this.moveTime);
+              callback();
+            })
+            .catch((error: any) => {
+              log.error(error);
+              this.moveTimer = setTimeout(() => {
+                this.targetPosition = this.currentPosition;
+                this.positionState = hap.Characteristic.PositionState.STOPPED;
+                this.curtainService?.getCharacteristic(hap.Characteristic.TargetPosition).updateValue(this.targetPosition);
+                // this.curtainService?.getCharacteristic(hap.Characteristic.CurrentPosition).updateValue(this.currentPosition);
+                this.curtainService?.getCharacteristic(hap.Characteristic.PositionState).updateValue(this.positionState);
+              }, 1000);
+              log.info("Target position of Curtain failed to be set to: " + this.targetPosition + "%");
+              callback();
+            });
         }
       });
 
-    this.curtainService.getCharacteristic(hap.Characteristic.PositionState)
+    this.curtainService
+      .getCharacteristic(hap.Characteristic.PositionState)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         log.info("The position state of Curtain was returned: " + this.positionState);
         callback(undefined, this.positionState);
@@ -172,10 +173,6 @@ export class Curtain implements AccessoryPlugin {
    * It should return all services which should be added to the accessory.
    */
   getServices(): Service[] {
-    return [
-      this.informationService,
-      this.curtainService,
-    ];
+    return [this.informationService, this.curtainService];
   }
-
 }

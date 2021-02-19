@@ -26,15 +26,21 @@
               "oneOf": [
                 {
                   "title": "Bot",
-                  "enum": ["bot"]
+                  "enum": [
+                    "bot"
+                  ]
                 },
                 {
                   "title": "Meter",
-                  "enum": ["meter"]
+                  "enum": [
+                    "meter"
+                  ]
                 },
                 {
                   "title": "Curtain",
-                  "enum": ["curtain"]
+                  "enum": [
+                    "curtain"
+                  ]
                 }
               ]
             },

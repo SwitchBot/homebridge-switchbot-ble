@@ -13,7 +13,6 @@ import {
 import { rejects } from "assert";
 
 export class Meter implements AccessoryPlugin {
-
   private readonly log: Logging;
   private readonly bleMac: string;
   private readonly scanDuration: number;
@@ -37,10 +36,11 @@ export class Meter implements AccessoryPlugin {
     this.scanInterval = scanInterval;
 
     this.temperatureSercice = new hap.Service.TemperatureSensor(name);
-    this.temperatureSercice.getCharacteristic(hap.Characteristic.CurrentTemperature)
+    this.temperatureSercice
+      .getCharacteristic(hap.Characteristic.CurrentTemperature)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         log.info(name + " current temperature: " + this.temperature + "\u2103");
-        callback(undefined, (this.temperature < 0) ? 0 : (this.temperature > 100 ? 100 : this.temperature));
+        callback(undefined, this.temperature < 0 ? 0 : this.temperature > 100 ? 100 : this.temperature);
       })
       .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
         log.info("The temperature of the Meter can't be set!");
@@ -48,7 +48,8 @@ export class Meter implements AccessoryPlugin {
       });
 
     this.humidityService = new hap.Service.HumiditySensor(name);
-    this.humidityService.getCharacteristic(hap.Characteristic.CurrentRelativeHumidity)
+    this.humidityService
+      .getCharacteristic(hap.Characteristic.CurrentRelativeHumidity)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         log.info(name + " current humidity: " + this.humidity + "%");
         callback(undefined, this.humidity);
@@ -65,7 +66,7 @@ export class Meter implements AccessoryPlugin {
 
     log.info(name, "scanDuration:" + this.scanDuration.toString() + "ms", "scanInterval:" + this.scanInterval.toString() + "ms");
 
-    const Switchbot = require('node-switchbot');
+    const Switchbot = require("node-switchbot");
     const switchbot = new Switchbot();
 
     switchbot.onadvertisement = (ad: any) => {
@@ -76,29 +77,37 @@ export class Meter implements AccessoryPlugin {
       this.humidity = ad.serviceData.humidity;
     };
 
-    switchbot.startScan({
-      id: bleMac,
-    }).then(() => {
-      return switchbot.wait(this.scanDuration);
-    }).then(() => {
-      switchbot.stopScan();
-    }).catch((error: any) => {
-      log.error(error);
-    });
+    switchbot
+      .startScan({
+        id: bleMac,
+      })
+      .then(() => {
+        return switchbot.wait(this.scanDuration);
+      })
+      .then(() => {
+        switchbot.stopScan();
+      })
+      .catch((error: any) => {
+        log.error(error);
+      });
 
     setInterval(() => {
       // log.info("Start scan " + name + "(" + bleMac + ")");
-      switchbot.startScan({
-        // mode: 'T',
-        id: bleMac,
-      }).then(() => {
-        return switchbot.wait(this.scanDuration);
-      }).then(() => {
-        switchbot.stopScan();
-        // log.info("Stop scan " + name + "(" + bleMac + ")");
-      }).catch((error: any) => {
-        log.error(error);
-      });
+      switchbot
+        .startScan({
+          // mode: 'T',
+          id: bleMac,
+        })
+        .then(() => {
+          return switchbot.wait(this.scanDuration);
+        })
+        .then(() => {
+          switchbot.stopScan();
+          // log.info("Stop scan " + name + "(" + bleMac + ")");
+        })
+        .catch((error: any) => {
+          log.error(error);
+        });
     }, this.scanInterval);
   }
 
@@ -115,11 +124,6 @@ export class Meter implements AccessoryPlugin {
    * It should return all services which should be added to the accessory.
    */
   getServices(): Service[] {
-    return [
-      this.informationService,
-      this.temperatureSercice,
-      this.humidityService,
-    ];
+    return [this.informationService, this.temperatureSercice, this.humidityService];
   }
-
 }

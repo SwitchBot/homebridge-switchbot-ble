@@ -10,27 +10,36 @@
 The @switchbot/homebridge-switchbot-ble is a nodejs module , and also a homebridge plug-in that directly controls SwitchBot products via BLE.
 
 Now supports:
- * [SwitchBot (Bot)](https://www.switch-bot.com/products/switchbot-bot)
- * [SwitchBot Curtain (Curtain)](https://www.switch-bot.com/products/switchbot-curtain)
- * [SwitchBot Thermometer & Hygrometer (Meter)](https://www.switch-bot.com/products/switchbot-meter)
+
+- [SwitchBot (Bot)](https://www.switch-bot.com/products/switchbot-bot)
+- [SwitchBot Curtain (Curtain)](https://www.switch-bot.com/products/switchbot-curtain)
+- [SwitchBot Thermometer & Hygrometer (Meter)](https://www.switch-bot.com/products/switchbot-meter)
 
 ## Installation
+
 ### Installing bluetooth libraries
+
 ##### Ubuntu, Debian, Raspbian
+
 ```sh
 sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
 ```
+
 See the document of the [@abandonware/noble](https://github.com/abandonware/noble#readme) for other operating systems details.
 
 ### Installing package
+
 ```sh
 sudo npm install -g @switchbot/homebridge-switchbot-ble
 ```
+
 You can also install it on the homebridge plugins page.
 ![homebridge-plugins-search](image/homebridge-plugins-search.png)
 
 ## Configuration
+
 Add this to your homebridge `config.json` file
+
 ```json
 "platforms": [
     {
@@ -39,7 +48,9 @@ Add this to your homebridge `config.json` file
     }
 ]
 ```
+
 If it work, add devices.
+
 ```json
 "platforms": [
     {
@@ -78,16 +89,18 @@ If it work, add devices.
 ```
 
 **Requird Settings**
-* `devices` - SwitchBot devices list.
-* `type` - Device type. Currently supports `bot`, `curtain` and `meter`.
-* `name` - Device name.
-* `bleMac` - Device mac address. You can find it in App settings.
+
+- `devices` - SwitchBot devices list.
+- `type` - Device type. Currently supports `bot`, `curtain` and `meter`.
+- `name` - Device name.
+- `bleMac` - Device mac address. You can find it in App settings.
 
 **Optional Settings**
-* `scanDuration` - Scan timeout. BLE Central must first scan the advertising. Default is `1000`(unit: ms). Longer time to ensure device discovery but slower response.
-* `reverseDir` - Set to `true` to exchange the "opened" and "closed" directions of Curtain after calibration. Default is `false`. So you can swap the directions without recalibration.
-* `moveTime` - Set the actual running time of Curtian, which is also the time to switch from running state to opened/closeed state in the Home APP. Default is `2000`(unit: ms).
-* `scanInterval` - Scan interval. Currently indicates the cycle of updating the temperature and humidity value of Meter. Default is `60000`(unit: ms).
+
+- `scanDuration` - Scan timeout. BLE Central must first scan the advertising. Default is `1000`(unit: ms). Longer time to ensure device discovery but slower response.
+- `reverseDir` - Set to `true` to exchange the "opened" and "closed" directions of Curtain after calibration. Default is `false`. So you can swap the directions without recalibration.
+- `moveTime` - Set the actual running time of Curtian, which is also the time to switch from running state to opened/closeed state in the Home APP. Default is `2000`(unit: ms).
+- `scanInterval` - Scan interval. Currently indicates the cycle of updating the temperature and humidity value of Meter. Default is `60000`(unit: ms).
 
 Please note that:
 
@@ -97,6 +110,6 @@ Please note that:
 
 ## Community
 
-* [SwitchBot (Official website)](https://www.switch-bot.com/)
-* [Facebook @SwitchBotRobot](https://www.facebook.com/SwitchBotRobot/) 
-* [Twitter @SwitchBot](https://twitter.com/switchbot) 
+- [SwitchBot (Official website)](https://www.switch-bot.com/)
+- [Facebook @SwitchBotRobot](https://www.facebook.com/SwitchBotRobot/)
+- [Twitter @SwitchBot](https://twitter.com/switchbot)

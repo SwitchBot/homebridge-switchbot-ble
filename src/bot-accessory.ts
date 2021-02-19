@@ -15,7 +15,6 @@ import {
 import { rejects } from "assert";
 
 export class Bot implements AccessoryPlugin {
-
   private readonly log: Logging;
   private readonly bleMac: string;
   private readonly scanDuration: number;
@@ -36,7 +35,8 @@ export class Bot implements AccessoryPlugin {
     this.scanDuration = scanDuration;
 
     this.botService = new hap.Service.Switch(name);
-    this.botService.getCharacteristic(hap.Characteristic.On)
+    this.botService
+      .getCharacteristic(hap.Characteristic.On)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         log.info("Current state of Bot was returned: " + (this.switchOn ? "ON" : "OFF"));
         callback(undefined, this.switchOn);
@@ -51,57 +51,59 @@ export class Bot implements AccessoryPlugin {
         }
         // Target state has been changed.
         log.info("Target state of Bot setting: " + (targetState ? "ON" : "OFF"));
-        const SwitchBot = require('node-switchbot');
+        const SwitchBot = require("node-switchbot");
         const switchbot = new SwitchBot();
-        switchbot.discover({ duration: this.scanDuration, model: 'H', quick: false }).then((device_list: any) => {
-          log.info('Scan done.');
-          let targetDevice: any = null;
-          for (let device of device_list) {
-            // log.info(device.modelName, device.address);
-            if (device.address == this.bleMac) {
-              targetDevice = device;
-              break;
+        switchbot
+          .discover({ duration: this.scanDuration, model: "H", quick: false })
+          .then((device_list: any) => {
+            log.info("Scan done.");
+            let targetDevice: any = null;
+            for (let device of device_list) {
+              // log.info(device.modelName, device.address);
+              if (device.address == this.bleMac) {
+                targetDevice = device;
+                break;
+              }
             }
-          }
-          if (!targetDevice) {
-            log.info('No device was found.');
-            return new Promise((resolve, reject) => {
-              reject(new Error('No device was found.'));
-            });
-          }
-          else {
-            log.info(targetDevice.modelName + ' (' + targetDevice.address + ') was found.');
-            // Set event handers
-            targetDevice.onconnect = () => {
-              // log.info('Connected.');
-            };
-            targetDevice.ondisconnect = () => {
-              // log.info('Disconnected.');
-            };
-            log.info('Bot is running...');
-            if (targetState) {
-              return targetDevice.turnOn();
+            if (!targetDevice) {
+              log.info("No device was found.");
+              return new Promise((resolve, reject) => {
+                reject(new Error("No device was found."));
+              });
+            } else {
+              log.info(targetDevice.modelName + " (" + targetDevice.address + ") was found.");
+              // Set event handers
+              targetDevice.onconnect = () => {
+                // log.info('Connected.');
+              };
+              targetDevice.ondisconnect = () => {
+                // log.info('Disconnected.');
+              };
+              log.info("Bot is running...");
+              if (targetState) {
+                return targetDevice.turnOn();
+              } else {
+                return targetDevice.turnOff();
+              }
             }
-            else {
-              return targetDevice.turnOff();
-            }
-          }
-        }).then(() => {
-          log.info('Done.');
-          this.switchOn = targetState;
-          this.runTimer = setTimeout(() => {
-            this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(this.switchOn);
-          }, 500);
-          log.info("Bot state has been set to: " + (this.switchOn ? "ON" : "OFF"));
-          callback();
-        }).catch((error: any) => {
-          log.error(error);
-          this.runTimer = setTimeout(() => {
-            this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(this.switchOn);
-          }, 500);
-          log.info("Bot state failed to be set to: " + (targetState ? "ON" : "OFF"));
-          callback();
-        });
+          })
+          .then(() => {
+            log.info("Done.");
+            this.switchOn = targetState;
+            this.runTimer = setTimeout(() => {
+              this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(this.switchOn);
+            }, 500);
+            log.info("Bot state has been set to: " + (this.switchOn ? "ON" : "OFF"));
+            callback();
+          })
+          .catch((error: any) => {
+            log.error(error);
+            this.runTimer = setTimeout(() => {
+              this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(this.switchOn);
+            }, 500);
+            log.info("Bot state failed to be set to: " + (targetState ? "ON" : "OFF"));
+            callback();
+          });
       });
 
     this.informationService = new hap.Service.AccessoryInformation()
@@ -125,10 +127,6 @@ export class Bot implements AccessoryPlugin {
    * It should return all services which should be added to the accessory.
    */
   getServices(): Service[] {
-    return [
-      this.informationService,
-      this.botService,
-    ];
+    return [this.informationService, this.botService];
   }
-
 }
