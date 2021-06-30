@@ -18,6 +18,7 @@ export class Bot implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly bleMac: string;
   private readonly scanDuration: number;
+  private readonly switchbot: any;
 
   private switchOn = false;
   private runTimer!: NodeJS.Timeout;
@@ -33,6 +34,8 @@ export class Bot implements AccessoryPlugin {
     this.name = name;
     this.bleMac = bleMac;
     this.scanDuration = scanDuration;
+    const SwitchBot = require("node-switchbot");
+    this.switchbot = new SwitchBot();
 
     this.botService = new hap.Service.Switch(name);
     this.botService
@@ -51,10 +54,8 @@ export class Bot implements AccessoryPlugin {
         }
         // Target state has been changed.
         log.info("Target state of Bot setting: " + (targetState ? "ON" : "OFF"));
-        const SwitchBot = require("node-switchbot");
-        const switchbot = new SwitchBot();
-        switchbot
-          .discover({ duration: this.scanDuration, model: "H", quick: false })
+        this.switchbot
+          .discover({ duration: this.scanDuration, model: "H", quick: true, id: this.bleMac })
           .then((device_list: any) => {
             log.info("Scan done.");
             let targetDevice: any = null;
@@ -66,9 +67,9 @@ export class Bot implements AccessoryPlugin {
               }
             }
             if (!targetDevice) {
-              log.info("No device was found.");
+              log.info("No device was found during scan.");
               return new Promise((resolve, reject) => {
-                reject(new Error("No device was found."));
+                reject(new Error("No device was found during scan."));
               });
             } else {
               log.info(targetDevice.modelName + " (" + targetDevice.address + ") was found.");
@@ -80,11 +81,7 @@ export class Bot implements AccessoryPlugin {
                 // log.info('Disconnected.');
               };
               log.info("Bot is running...");
-              if (targetState) {
-                return targetDevice.turnOn();
-              } else {
-                return targetDevice.turnOff();
-              }
+              return this.setTargetDeviceState(targetDevice, targetState);
             }
           })
           .then(() => {
@@ -112,6 +109,28 @@ export class Bot implements AccessoryPlugin {
       .setCharacteristic(hap.Characteristic.SerialNumber, this.bleMac);
 
     log.info("Bot '%s' created!", name);
+  }
+
+  async retry(max: number, fn: Function): Promise<null> {
+    return fn().catch( async (err: any) => {
+      if (max == 0) {
+        throw err;
+      }
+      this.log.info(err);
+      this.log.info("Retrying");
+      await this.switchbot.wait(1000);
+      return this.retry(max - 1, fn);
+    });
+  }
+
+  async setTargetDeviceState(targetDevice: any, targetState: boolean): Promise<null> {
+    return await this.retry(5, () => {
+      if (targetState) {
+        return targetDevice.turnOn();
+      } else {
+        return targetDevice.turnOff();
+      }
+    });
   }
 
   /*
