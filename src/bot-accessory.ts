@@ -111,7 +111,7 @@ export class Bot implements AccessoryPlugin {
     log.info("Bot '%s' created!", name);
   }
 
-  async retry(max: number, fn: Function): Promise<null> {
+  async retry(max: number, fn: { (): any; (): Promise<any>; }): Promise<null> {
     return fn().catch( async (err: any) => {
       if (max == 0) {
         throw err;
