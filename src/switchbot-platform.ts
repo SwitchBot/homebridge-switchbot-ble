@@ -6,7 +6,6 @@ import { AccessoryPlugin, API, HAP, Logging, PlatformConfig, StaticPlatformPlugi
 import { Bot } from "./bot-accessory";
 import { Curtain } from "./curtain-accessory";
 import { Meter } from "./meter-accessory";
-import { off } from "process";
 
 const PLATFORM_NAME = "SwitchBotPlatform";
 
@@ -75,7 +74,7 @@ class SwitchBotPlatform implements StaticPlatformPlugin {
           case "curtain":
             const reverseDir: boolean = device.reverseDir || false;
             const moveTime: number = device.moveTime || 2000;
-            deviceList.push(new Curtain(hap, this.log, device.name, device.bleMac.toLowerCase(), scanDuration, reverseDir, moveTime));
+            deviceList.push(new Curtain(hap, this.log, device.name, device.bleMac.toLowerCase(), scanDuration, reverseDir, moveTime, device.scanInterval || 60000));
             break;
           case "meter":
             let scanInterval: number = device.scanInterval || 60000;
