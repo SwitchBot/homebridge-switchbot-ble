@@ -97,10 +97,12 @@ If it work, add devices.
 
 **Optional Settings**
 
-- `scanDuration` - Scan timeout. BLE Central must first scan the advertising. Default is `1000`(unit: ms). Longer time to ensure device discovery but slower response.
+- `scanDuration` - Scan timeout. BLE Central must first scan the advertising. Default is `1000` (unit: ms). Longer time to ensure device discovery but slower response.
 - `reverseDir` - Set to `true` to exchange the "opened" and "closed" directions of Curtain after calibration. Default is `false`. So you can swap the directions without recalibration.
-- `moveTime` - Set the actual running time of Curtian, which is also the time to switch from running state to opened/closeed state in the Home APP. Default is `2000`(unit: ms).
-- `scanInterval` - Scan interval. Currently indicates the cycle of updating the temperature and humidity value of Meter. Default is `60000`(unit: ms).
+- `moveTime` - Set the actual running time of Curtain, which is also the time to switch from running state to opened/closed state in the Home APP. Default is `2000` (unit: ms).
+- `scanInterval`
+  - For a Meter, sets how frequently to scan in order to retrieve temperature and humidity values. Default is `60000` (unit: ms).
+  - For a Curtain, sets how frequently to scan in order to retrieve the curtain position. Default is `60000` (unit: ms) when idle.
 
 Please note that:
 
