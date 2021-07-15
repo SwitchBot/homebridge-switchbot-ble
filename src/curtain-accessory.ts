@@ -169,8 +169,6 @@ class Device {
 
 export class Curtain implements AccessoryPlugin {
   private readonly log: Logging;
-  private readonly bleMac: string;
-  private readonly scanDuration: number;
   private readonly reverseDir: boolean;
   private readonly moveTime: number;
 
@@ -181,13 +179,13 @@ export class Curtain implements AccessoryPlugin {
   private positionState = 0;
   private moveTimer!: NodeJS.Timeout;
 
+  private device: Device;
+
   // This property must be existent!!
   name: string;
 
   private readonly curtainService: Service;
   private readonly informationService: Service;
-
-  private device: Device;
 
   private currentPositionCharacteristic: Characteristic;
   private targetPositionCharacteristic: Characteristic;
@@ -196,8 +194,6 @@ export class Curtain implements AccessoryPlugin {
   constructor(hap: HAP, log: Logging, name: string, bleMac: string, scanDuration: number, reverseDir: boolean, moveTime: number, scanInterval: number) {
     this.log = log;
     this.name = name;
-    this.bleMac = bleMac;
-    this.scanDuration = scanDuration;
     this.reverseDir = reverseDir;
     this.moveTime = moveTime;
 
@@ -222,6 +218,12 @@ export class Curtain implements AccessoryPlugin {
     });
 
     this.positionState = hap.Characteristic.PositionState.STOPPED;
+
+    this.informationService = new hap.Service.AccessoryInformation()
+      .setCharacteristic(hap.Characteristic.Manufacturer, "SwitchBot")
+      .setCharacteristic(hap.Characteristic.Model, "SWITCHBOT-CURTAIN-W0701600")
+      .setCharacteristic(hap.Characteristic.SerialNumber, bleMac);
+
     this.curtainService = new hap.Service.WindowCovering(name);
 
     this.currentPositionCharacteristic = this.curtainService
@@ -295,11 +297,6 @@ export class Curtain implements AccessoryPlugin {
         log.info("The position state of Curtain was returned: " + this.positionState);
         callback(undefined, this.positionState);
       });
-
-    this.informationService = new hap.Service.AccessoryInformation()
-      .setCharacteristic(hap.Characteristic.Manufacturer, "SwitchBot")
-      .setCharacteristic(hap.Characteristic.Model, "SWITCHBOT-CURTAIN-W0701600")
-      .setCharacteristic(hap.Characteristic.SerialNumber, this.bleMac);
 
     log.info("Curtain '%s' created!", name);
   }
